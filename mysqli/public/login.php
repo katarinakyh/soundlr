@@ -1,8 +1,7 @@
 <?php 
-	include_once('session.php');
-		$_SESSION['username'] = 'none';
-		$_SESSION['user_id'] = 0;
 	include_once('header.php'); 
+	$_SESSION['username'] = 'none';
+	$_SESSION['user_id'] = 0;
 	
 ?>
 		<div class="admin">

@@ -1,5 +1,4 @@
 <?php
-include_once('session.php');
 include_once('header.php');
 
 $PDO = new PDO("mysql:host=localhost;dbname=music_rating", "root", "");
@@ -161,4 +160,6 @@ echo "<tr>
 			
 			
 						include ('footer.php');
+	("SELECT AVG(ratings.rating), ratings.categories_id, categories.name FROM ratings INNER JOIN categories ON ratings.categories_id = categories.id GROUP BY ratings.categories_id") 
+
 			?>

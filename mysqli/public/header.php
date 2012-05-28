@@ -1,4 +1,4 @@
-
+<?php include_once('session.php');?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
@@ -11,7 +11,7 @@
 		<h2>Welcome 
 		<?php 
 			if(isset($_SESSION['username']) && $_SESSION['username'] != 'none'){
-				echo $_SESSION['username'].$_SESSION['userid'];
+				echo $_SESSION['username'];
 			}else{
 				echo "to Soundlr";
 			}
