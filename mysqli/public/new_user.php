@@ -1,4 +1,4 @@
-<?php session_start()?>
+<?php include_once('session.php');?>
 <?php include('header.php'); ?>
 		<div class="admin">
 		<form action="<?php $_SERVER['PHP_SELF'];?>" method="post">

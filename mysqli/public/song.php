@@ -1,27 +1,27 @@
 <?php
-$PDO = new PDO("mysql:host=localhost;dbname=music_rating", "root", "");
+include_once('session.php');
+include_once('header.php');
 
-function executeQuery($query, $id, $PDO){
+$PDO = new PDO("mysql:host=localhost;dbname=music_rating", "root", "");
+$track = @$_GET['track'];
+$id = @$_GET['id'];
+
+function executeQuery($query, $id, $PDO) {
 	$stmt = $PDO -> prepare($query);
 	// skapa ett nytt object
-	
+
 	$binds = array(':id' => $id);
-	
+
 	// Do query (you can make several bind the same query)
-	
+
 	$stmt -> execute($binds);
 	//print_r($binds);
-	
+
 	// Fetch and send data
 	$result_set = $stmt -> fetch(PDO::FETCH_ASSOC);
 	// fetch LIMIT 1
 	return $result_set;
 }
-
-
-$track = @$_GET['track'];
-$id = @$_GET['id'];
-//echo $id;
 
 $query = "
 
@@ -43,43 +43,26 @@ $query = "
 	WHERE song.id = :id
 	
 	";
-$result_set = executeQuery($query, $id,$PDO);
 
-if(isset($_POST['submit_rate'])){
-	$query = "
-	INSERT INTO ratings 
-	(song_id, ratings, user_id, categories_id)
-	
-	VALUES
-	(:id,".$_POST['love'].",".$_SESSION['user_id'].", 1),
-	(:id,".$_POST['rage'].",".$_SESSION['user_id'].", 2),
-	(:id,".$_POST['speed'].",".$_SESSION['user_id'].", 3),
-	(:id,".$_POST['hate'].",".$_SESSION['user_id'].", 4);
-	
-	";	
-//	$posted_results = executeQuery($query, $id); FUNKAR INTE ÄN
-}
+	$result_set = executeQuery($query, $id, $PDO);
 
 ?>
 
-<?php
-include ('header.php');
-?>
 <div class="wrapper">
+<form method="post" action="<?php $_SERVER['PHP_SELF'];?>">
 	<table>
 		<tr>
 			<th>Track</th><th>Love</th><th>Rage</th><th>Speed</th><th>Hate</th><th>Artist</th><th>Album</th>
 		</tr>
 		<?php
 
-		$i = 0;
-		$j = 1;
-		while ($i < $j) {
-		echo "<tr>
-		<td>". $result_set['track']."</td>
-		<td>"
+$i = 0;
+$j = 1;
+while ($i < $j) {
+echo "<tr>
+<td>". $result_set['track']."</td>
+<td>"
 		?>
-		<form action="post" action="<?php $_SERVER['PHP_SELF'];?>">
 			<select name="love">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -92,7 +75,8 @@ include ('header.php');
 				<option value="4">9</option>
 				<option value="4">10</option>
 			</select>
-			</td> <td>
+			</td> 
+			<td>
 			<select name="rage">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -104,7 +88,8 @@ include ('header.php');
 				<option value="3">8</option>
 				<option value="4">9</option>
 				<option value="4">10</option>
-			</select></td>
+			</select>
+			</td>
 			<td>
 			<select name="speed">
 				<option value="1">1</option>
@@ -117,7 +102,8 @@ include ('header.php');
 				<option value="3">8</option>
 				<option value="4">9</option>
 				<option value="4">10</option>
-			</select></td>
+			</select>
+			</td>
 			<td>
 			<select name="hate">
 				<option value="1">1</option>
@@ -139,20 +125,40 @@ include ('header.php');
 			}
 		?>
 		<tr>
-			<td> <audio controls=\"controls\">
-			<source src=\"media/juicy.ogg\" type=\"audio/ogg\" />
-			<source src=\"song.mp3\" type=\"audio/mp3\" />
-			Your browser does not support the audio tag.
-			</audio>
+			<td> 
+				<audio controls="controls">
+					<source src="media/juicy.ogg" type="audio/ogg" />
+					<source src="song.mp3" type="audio/mp3" />
+					Your browser does not support the audio tag.
+				</audio>
 			</td>
 			<th colspan=4>
-			<input type="submit" name="submit_rate" value="Vote" />
+				<input type="submit" name="submit" value="Vote" />
 			</th>
 			<td></td>
 			<td></td>
-			</tr>
-			</table>
-			</div>
+		</tr>
+	</table>
+</div>
 			<?php
-			include ('footer.php');
+	if (isset($_POST['submit'])) {
+		echo "HÄÄÄÄÄÄÄÄÄÄÄR";
+		$playlistquery = "
+		INSERT INTO ratings 
+		(song_id, ratings, user_id, categories_id)
+		
+		VALUES
+		(:id," . $_POST['love'] . "," . $_SESSION['user_id'] . ", 1),
+		(:id," . $_POST['rage'] . "," . $_SESSION['user_id'] . ", 2),
+		(:id," . $_POST['speed'] . "," . $_SESSION['user_id'] . ", 3),
+		(:id," . $_POST['hate'] . "," . $_SESSION['user_id'] . ", 4);
+		
+		";
+		
+		$posted_results = executeQuery($playlistquery, $id, $PDO);
+		echo $playlistquery;
+	}
+			
+			
+						include ('footer.php');
 			?>

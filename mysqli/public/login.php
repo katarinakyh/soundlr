@@ -1,9 +1,10 @@
-<?php  
-	if(isset($_SESSION['username'])){
-		unset($_SESSION['username']);
-	}
+<?php 
+	include_once('session.php');
+		$_SESSION['username'] = 'none';
+		$_SESSION['user_id'] = 0;
+	include_once('header.php'); 
+	
 ?>
-<?php include('header.php'); ?>
 		<div class="admin">
 			<form id="loginForm" name="loginForm" method="post" action="login-exec.php">
 				<table border="0" align="center" cellpadding="2" cellspacing="0">

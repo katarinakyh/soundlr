@@ -1,6 +1,5 @@
 <?php
-//Start session
-session_start();
+	include_once('session.php');
 	//echo $_POST['username'] . '<br/>';
 	//echo $_POST['password'] . '<br/>';
 	$error = false;

@@ -1,4 +1,4 @@
-<?php session_start();?>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
@@ -10,10 +10,10 @@
 		<h1 class='logo_top'></h1>
 		<h2>Welcome 
 		<?php 
-			if(isset($_SESSION['username'])){
+			if(isset($_SESSION['username']) && $_SESSION['username'] != 'none'){
 				echo $_SESSION['username'].$_SESSION['userid'];
 			}else{
-				echo "Welcome to Soundlr";
+				echo "to Soundlr";
 			}
 		?>	
 		</h2>
