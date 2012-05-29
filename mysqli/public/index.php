@@ -48,6 +48,17 @@ $count = $stmt->rowCount();
 
 // Fetch and send data 
 $result_set = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetch LIMIT 1
+if (isset($_POST['submit_song_to_playlist'])) {
+	$playlist = $_POST['playlist'];
+	$song = $_POST['song'];
+	
+	$stmt_playlist = $PDO->prepare("INSERT INTO playlist_song (playlist_id, song_id)
+	VALUES (:playlist, :song)");
+	$binds3 = array(":playlist" => $playlist, ":song" => $song);
+	$stmt_playlist->execute($binds3);
+	print_r($stmt_playlist);	
+	echo "end of query".$playlist.' song: '.$song; 
+}
 ?>
 <?php include('header.php'); ?>
 
@@ -82,7 +93,10 @@ $result_set = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetch LIMIT 1
 		echo "<div class=\"result_message\">Your search for: &quot;" . $var . "&quot; returned " .count($result_set). " results</div>";
 		
 		$i = 0; ?>
-	</div>
+
+		<?php if (isset($_POST['submit_song_to_playlist'])) { 
+		echo "You added a new song to your current playlist"; 
+		} ?>	</div>
 	
 		
 		<table class="searchresults">
@@ -93,8 +107,9 @@ $result_set = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetch LIMIT 1
 		while ($i < $count) {
 			echo "<tr><th>" ?>
 			<form action="<?php $_SERVER['PHP_SELF'];?>" method="post">				
-						<input type="hidden" name="song" value="tracknumber">
-						<input type="submit" name="submit" value="+" />					
+		<input type="hidden" name="song" value="<?php echo $result_set[$i]['id'];  ?>">						
+		<input type="hidden" name="playlist" value="17">
+		<input type="submit" name="submit_song_to_playlist" value="+" />				
 			</form>
 	</th><td><?php echo "<a href=\"song.php?track=" . $result_set[$i]['track']. "&id=".$result_set[$i]['id']."&artist_id=\"". $result_set[$i]['artist_id']."\">". $result_set[$i]['track']. "</a></td><td> <a href=\"artist.php?artist=" .$result_set[$i]['artist']. "\">". $result_set[$i]['artist']."</a></td><td>  <a href=\"album.php?album=".$result_set[$i]['album']."\">". $result_set[$i]['album']. "</a></td></tr>";
 			$i++; 
