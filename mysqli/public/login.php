@@ -1,8 +1,7 @@
 <?php 
-	include_once('header.php'); 
-	$_SESSION['username'] = 'none';
-	$_SESSION['user_id'] = 0;
-	
+	include_once('header.php');
+		$_SESSION['username'] = 'none';
+		$_SESSION['user_id'] = 0;
 ?>
 		<div class="admin">
 			<form id="loginForm" name="loginForm" method="post" action="login-exec.php">
