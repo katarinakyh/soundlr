@@ -1,7 +1,7 @@
 <?php
 include_once('header.php');
 
-$PDO = new PDO("mysql:host=localhost;dbname=music_rating", "root", "");
+$PDO = new PDO("mysql:host=localhost;dbname=music_rating", "root", "toor");
 $track = @$_GET['track'];
 $id = @$_GET['id'];
 
