@@ -30,16 +30,25 @@
 		include_once ('../server/connect.php');
 		
 		function updatePlaylists($PDO) {
-			$stmt2 = $PDO -> prepare("SELECT * FROM playlists WHERE user_id = :userid ORDER BY id DESC");
+			$stmt2 = $PDO -> prepare(
+							"SELECT playlists.name, playlists.date, COUNT(playlist_song.song_id) AS songs 
+							FROM playlists  
+							LEFT JOIN playlist_song 
+							ON playlists.id = playlist_song.playlist_id
+							WHERE user_id = :userid
+							GROUP BY playlists.id  
+							ORDER BY playlists.id DESC"
+						);
 			$binds2 = array(":userid" => $_SESSION['userid']);
 			$stmt2 -> execute($binds2);
 			$playlists = $stmt2 -> fetchAll(PDO::FETCH_ASSOC);
+			
 			$count = count($playlists);
 			//echo $count;
 			for($i = 0; $i < count($playlists); $i++) {
 				echo "<tr><td>" . $playlists[$i]['name']."</td>";
 				echo "<td></td>";
-				echo "<td>0</td>";
+				echo "<td>". $playlists[$i]['songs']."</td>";
 				echo "<td>" . $playlists[$i]['date']."</td></tr>"; 
 			}
 		}
