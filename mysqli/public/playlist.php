@@ -1,21 +1,30 @@
 <?php
+
 if ((isset($_POST["add_playlist"])) && ($_POST["add_playlist"] == "playlist_form")) {
 
 	include_once('../server/connect.php');
-	$name = @$_GET['playlist_name'];
-	$stmt_p = $PDO->prepare("INSERT INTO playlist (name) 
-							VALUES :name");
-	$playlistbinds = array(":name" => $name);
-	$stmt_p -> execute($playlistbinds);	
+	$name = $_POST['playlist_name'];
+	$stmt1 = $PDO -> prepare("INSERT INTO playlists (name, user_id) 
+							VALUES (:name, :user_id)");
+	$binds1 = array(":name" => $name, ":user_id" => $_SESSION['userid']);
+	$stmt1 -> execute($binds1);
+	
+    echo "<div class=\"alert\"> playlist added </div>";
+	
+	//get all playlists by logged in user
+	function updatePlaylists($PDO){
+		$stmt2 = $PDO -> prepare("SELECT * FROM playlists WHERE user_id = :userid");
+		$binds2 = array(":userid" => $_SESSION['userid']);
+		$stmt2 -> execute($binds2);
+		$result2 = $stmt2->fetchAll(PDO::FETCH_ASSOC); // fetch LIMIT 1
+		print_r($result2);
+	}
+	updatePlaylists($PDO);
 }
 	
 ?>
 <form action="" method="post" name="playlist_form" id="playlist_form">
  <table>
-
-       <?php if ((isset($_POST["add_playlist"])) && ($_POST["add_playlist"] == "playlist_form")) {
-       echo "<div class=\"alert\"> playlist added </div>";
-       } ?>
    <tr>
      <th colspan="3" >Add new Playlist</td>
    </tr>

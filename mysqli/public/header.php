@@ -11,7 +11,7 @@
 		<h2>Welcome 
 		<?php 
 			if(isset($_SESSION['username']) && $_SESSION['username'] != 'none'){
-				echo $_SESSION['username'];
+				echo $_SESSION['username']. ' ' .$_SESSION['userid'];
 			}else{
 				echo "to Soundlr";
 			}

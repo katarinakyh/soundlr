@@ -33,7 +33,6 @@
 		</div> 
 
 		<?php
-		include_once('user.php');
 
 		if (isset($_POST['submit'])) {
 			$username = $_POST['username'];
@@ -41,25 +40,22 @@
 			$password = $_POST['password'];
 			
 			
-			
-			//Create query
-			include_once('connect.php');
-			
-			$mysqli = new Connect(); 
-			$mysqli -> connectdb();
-			
-			$qry = "INSERT INTO user  (user_name, user_email, password) VALUES (?,?,?)";
-			$result = $mysqli -> prepare($qry);
-			$result -> bind_param('sss', $username, $email, $password);
-			$result-> execute();
-
-			printf("%d Row inserted.\n", $result->affected_rows);
-			
-			/* close statement and connection */
-			$result->close();
-
-			/* close connection */
-			$mysqli->close();
+					//Create query
+			include_once ('../server/connect.php');
+			$stmt = $PDO -> prepare("INSERT INTO user (user_name, user_email, password, create_date) VALUES (:name,:email,:password, NOW())");
+			$binds = array(':name' => $username, ':email' => $email, ':password' => $password);
+		
+			$stmt -> execute($binds);
+			$insert_id = $PDO -> lastInsertId();
+				if($insert_id){
+				$_SESSION['username'] = $username;
+				$_SESSION['userid'] = $insert_id;
+				$_SESSION['LOGIN_FAIL'] = FALSE;
+				$_SESSION['LOGIN_ERR'] = FALSE;
+				header('location: index.php');
+			}else{
+				echo "The username is already in use, please try another one.";
+			}			
 		}
 		?>
 	
