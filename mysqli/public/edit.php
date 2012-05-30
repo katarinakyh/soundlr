@@ -59,7 +59,7 @@
 			echo "<td>". $playlists[$i]['albums']."</td>";
 			?><td> <form action="" method="post">
 				<input type="hidden" name="playlistsong" value="<?php echo $playlists[$i]['songsid'];  ?>">
-				<input type="submit" name="remove" value="remove"> 
+				<input type="submit" name="remove" value="X"> 
 				</form></td></tr> <?php
 		}
 		echo "</table>";
@@ -78,12 +78,9 @@
 		$stmt_user -> execute($binds);
 		$userlist = $stmt_user -> fetchAll(PDO::FETCH_ASSOC);
 	
-		echo "<table><tr><th>Playlist name</th><th>User</th><th>Privilege</th><th>save</th></tr>";		
-			echo "<tr><td>".$playlistname; ?><form action="" method="post">
-			</td>
-			 <?php
-
-			echo "<td><select name=\"users\" class=\"width\">"; 
+		?> <table><form action="" method="post">
+			<tr>
+			<td><select name="users" class="width">  <?php
 			for($j = 0; $j < count($userlist); $j++) { 
 				echo "<option value=\"".$userlist[$j]['userid']."\">". $userlist[$j]['username'] ."</option>";
 			}
@@ -92,13 +89,12 @@
 		<input type="hidden" name="user" value="<?php echo $userlist[$j]['userid'];  ?>">						
 		<input type="hidden" name="playlist" value="<?php echo $playlistid;  ?>">
 		<select name="privilage" class="width">
-				<option value="0" selected="selected">no privilege</option>
 				<option value="1">can edit</option>
 				<option value="2">can edit and listen</option>
 		</select>
 	 
-			</td>
-			<td><input type="submit" name="submit_rights" value="save" />				
+			</td><td>playlist: <?php echo "$playlistname"; ?></td>
+			<td><input type="submit" name="submit_rights" value="share" />				
 			</form> </td></tr>
 		<?php
 		echo "</table><br /><br />";
