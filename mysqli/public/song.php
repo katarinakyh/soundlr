@@ -5,20 +5,6 @@
 		$track = @$_GET['track'];
 		$id = @$_GET['id'];
 		$rate = 4;	
-		function executeQuery($qry, $bnds = NULL, $PDOs) {
-			$stmt = $PDOs -> prepare($qry);
-			// skapa ett nytt object
-			// Do query (you can make several bind the same query)
-			if($bnds){
-				$stmt -> execute($bnds);
-			}else{
-				$stmt -> execute();
-			}
-			// Fetch and send data
-			$result_set = $stmt -> fetch(PDO::FETCH_ASSOC);
-			// fetch LIMIT 1
-			return $result_set;
-		}
 		
 		//basic query to load the right song
 		$query = "
@@ -43,11 +29,13 @@
 		$binds = array(':id' => $id);
 		
 		$result_set = executeQuery($query, $binds, $PDO);
-		
+		$count = $result_set['affected_rows'];
+		$result_set = $result_set['rows'][0];
+		//print_r($result_set);
 		?>
 		
 		<div class="wrapper">
-			<form method="post" action="<?php $_SERVER['PHP_SELF'];?>">
+			<form method="post" action="">
 				<table border = "1">
 					<tr>
 						<th>Track</th><th>Love</th><th>Rage</th><th>Speed</th><th>Hate</th><th>Artist</th><th>Album</th>
@@ -140,7 +128,7 @@
 						$checkbinds = array(':id' => $id, 'userid' => $_SESSION['userid']);
 						$check = executeQuery($checkquery, $checkbinds, $PDO);
 						//print_r($check);
-						if($check == NULL){
+						if($check['rows'] == NULL){
 							$playlistquery = "
 								INSERT INTO ratings (song_id, rating, users_id, categories_id)
 								VALUES (:song_id, :rating, :userid, :catid)
@@ -164,8 +152,9 @@
 						
 						}
 					}
-					//take out the average ratings
+
 					$rates = array();
+					$empty = array();
 					$ratequery = "
 						SELECT AVG(ratings.rating) AS avg, ratings.categories_id 
 						FROM ratings 
@@ -173,16 +162,32 @@
 						WHERE ratings.categories_id = :catid 
 						AND song_id = :id
 						GROUP BY ratings.categories_id";
-			
+
 					for($j = 0; $j < 4; $j++){
 						$ratebinds = array(':catid' => $j + 1, ':id'=> $id);
-						$rates[] = executeQuery($ratequery, $ratebinds, $PDO);
+						$temp = executeQuery($ratequery, $ratebinds, $PDO);
+						if($temp['affected_rows'] < 1){
+							
+						}else{
+							$rates[] = $temp['rows'];
+						}
 					}
-//					print_r($rates);
-					for($k = 0; $k < count($rates ); $k++){
-						echo "<td>". round($rates [$k]['avg'],1). "</td>";
-					} 
-					
+					//print_r($rates);
+					if($rates){
+						for($k = 0; $k < 4; $k++){
+							echo "<td>". round($rates[$k][0]['avg'],1). "</td>";
+						}
+					}else{
+						for($l = 0; $l < 4; $l++){
+							echo "<td>0</td>";
+						}
+					}
+					unset($rates);
+
+						
+
+					 
+
 					?>
 				<td rowspan="2"></td>
 				<td rowspan="2"></td>

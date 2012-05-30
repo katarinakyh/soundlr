@@ -2,19 +2,60 @@
 		include_once('header.php');
 		include_once('../server/connect.php');		
 
+		$playlistid = @$_GET['id']; // the song 
+		$playlistname = @$_GET['name']; // the playlist
+		$playlistowner = @$_GET['owner']; // 
+		$user = $_SESSION['userid'];
+
 		if(isset($_POST['submit_rights'])) {
-			echo $_POST['users']; 
-
-			$right_query = $PDO -> prepare("INSERT INTO playlist_rights (users_id, playlist_id, right_to_change)
-											VALUES (:userid, :playlistid, :rights)");
-
-			$bindsright = array(
-								":userid" => $_POST['user'], 
-								":playlistid" => $_POST['playlist'], 
-								":rights"=> $_POST['users']
-								);
-			$right_query -> execute($bindsright);
-		
+		echo $_POST['rights']; 
+			
+			$checkquery = "
+				SELECT users_id FROM playlist_rights
+				WHERE playlist_id = :playlistid
+				AND users_id = :userid
+			";
+			$bindcheck = array(':playlistid' => $playlistid, ':userid' => $_POST['users']);
+			
+			$checkuser = executeQuery($checkquery, $bindcheck, $PDO);
+			$ifDelete = false;
+			$ifqurry = true;
+			if($checkuser['affected_rows'] == 1){
+				if($_POST['rights'] == 0){
+					$right_query = "
+						DELETE FROM playlist_rights
+						WHERE users_id = :userid AND playlist_id = :playlistid";
+						$ifDelete = true;
+				}else{
+					$right_query = "
+								UPDATE playlist_rights
+								SET right_to_change = :rights
+								WHERE users_id = :userid AND playlist_id = :playlistid";
+				}
+			}else if($_POST['rights'] != 0){
+				$right_query = "INSERT INTO playlist_rights (users_id, playlist_id, right_to_change)
+								VALUES (:userid, :playlistid, :rights)";
+			
+			}
+			else{
+				$ifqurry = false;	
+			}
+			if($ifqurry){
+					if($ifDelete){
+						$bindsright = array(
+											":userid" => $_POST['users'], 
+											":playlistid" => $_POST['playlist']
+											);
+					}
+					else{
+						$bindsright = array(
+											":userid" => $_POST['users'], 
+											":playlistid" => $_POST['playlist'], 
+											":rights" => ($_POST['rights'] -1)
+											);
+						}
+					$right_query = executeQuery($right_query, $bindsright, $PDO);
+				}
 		}
 
 		if(isset($_POST['remove'])) { 
@@ -23,27 +64,30 @@
 			$remove_query -> execute($bindsdel);
 		}
 
-
-		$playlistid = @$_GET['id']; // the song 
-		$playlistname = @$_GET['name']; // the playlist
-		$playlistowner = @$_GET['owner']; // 
-		$user = $_SESSION['userid'];
-
-
-		
 		$stmt2 = $PDO -> prepare(
-					"SELECT song.name AS songs,  song.id AS songsid, artist.name AS artists, album.name AS albums
+					"SELECT song.name AS songs,  
+					playlist_song.id AS songsid, 
+					artist.name as artists,
+					GROUP_CONCAT(album.name) as albums
+					
 					FROM song
+
 					LEFT JOIN playlist_song 
-					ON playlist_song.id = song.id
+					ON playlist_song.song_id = song.id
+
 					LEFT JOIN artist
 					ON artist.id = song.artist_id
+
 					LEFT JOIN song_album
 					ON song_album.song_id = song.id
+
 					LEFT JOIN album
 					ON album.id = song_album.album_id
+
 					WHERE playlist_song.playlist_id = :playlistid
+					GROUP BY song.name
 					ORDER BY song.name ASC"
+					
 					);
 
 		$binds2 = array(":playlistid" => $playlistid);
@@ -59,7 +103,7 @@
 			echo "<td>". $playlists[$i]['albums']."</td>";
 			?><td> <form action="" method="post">
 				<input type="hidden" name="playlistsong" value="<?php echo $playlists[$i]['songsid'];  ?>">
-				<input type="submit" name="remove" value="remove"> 
+				<input type="submit" name="remove" value="X"> 
 				</form></td></tr> <?php
 		}
 		echo "</table>";
@@ -92,11 +136,11 @@
 				</select>
 			</td>
 			<td> 
-				<input type="hidden" name="user" value="<?php echo $_SESSION['userid'];  ?>">						
+				<input type="hidden" name="owner" value="<?php echo $_SESSION['userid'];  ?>">						
 				<input type="hidden" name="playlist" value="<?php echo $playlistid;  ?>">
-				<select name="privilage" class="width">
-					<option value="0" selected="selected">no priviledges</option>
-					<option value="1">can edit</option>
+				<select name="rights" class="width">
+					<option value="0" selected="selected">no privileges</option>
+					<option value="1">can listen</option>
 					<option value="2">can edit and listen</option>
 				</select>
 			</td>
@@ -107,3 +151,4 @@
 		</tr>
 	</table>
 <br /><br />
+<?php } ?>

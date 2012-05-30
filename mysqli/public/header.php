@@ -7,7 +7,7 @@
 		<link href='css/style.css' media='all' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
-		<h1 class='logo_top'></h1>
+		<a href="index.php"><h1 class='logo_top'></h1></a>
 		<h2>Welcome 
 		<?php if(@$_GET['l']){
 				echo "to Soundlr";

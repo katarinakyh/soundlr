@@ -181,4 +181,7 @@ select {
 	width: 600px;
 	margin-right: -60px;
 }
+.width{
+	width: 100%
+}
 
