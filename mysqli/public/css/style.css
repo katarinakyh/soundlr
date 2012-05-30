@@ -185,3 +185,6 @@ select {
 	width: 100%
 }
 
+.genre{
+	float:left;
+}

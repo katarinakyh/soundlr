@@ -37,14 +37,15 @@
 			include_once ('../server/connect.php');
 			
 			function updatePlaylists($PDO) {
-				$updatequery = "SELECT playlists.id, playlists.name, playlists.user_id, playlists.date, 
-								COUNT(playlist_song.song_id) AS songs 
-								FROM playlists  
-								LEFT JOIN playlist_song 
-								ON playlists.id = playlist_song.playlist_id
-								WHERE playlists.user_id = :userid
-								GROUP BY playlists.id  
-								ORDER BY playlists.id DESC";
+				$updatequery = "
+					SELECT playlists.id, playlists.name, playlists.user_id, playlists.date, 
+					COUNT(playlist_song.song_id) AS songs 
+					FROM playlists  
+					LEFT JOIN playlist_song 
+					ON playlists.id = playlist_song.playlist_id
+					WHERE playlists.user_id = :userid
+					GROUP BY playlists.id  
+					ORDER BY playlists.id DESC";
 				$udatebinds = array(":userid" => $_SESSION['userid']);
 				$playlists = executeQuery($updatequery,$udatebinds, $PDO);
 				$playlistcount = $playlists['affected_rows'];

@@ -200,6 +200,9 @@
 			</tr>
 			</table>
 		</div>
+		
 		<?php
-		include ('footer.php');
+		include_once('genre.php');
+		include_once('footer.php');
 		?>
+		
