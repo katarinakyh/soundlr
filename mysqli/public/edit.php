@@ -3,16 +3,16 @@
 		include_once('../server/connect.php');		
 
 		if(isset($_POST['submit_rights'])) {
-			$rights;		
 			echo $_POST['users']; 
-			
-			$rights = $_POST['users'];
-			
 
 			$right_query = $PDO -> prepare("INSERT INTO playlist_rights (users_id, playlist_id, right_to_change)
-			VALUES (:userid, :playlistid, ".$rights .")");
+											VALUES (:userid, :playlistid, :rights)");
 
-			$bindsright = array(":userid" => $_POST['user'], ":playlistid" => $_POST['playlist']);
+			$bindsright = array(
+								":userid" => $_POST['user'], 
+								":playlistid" => $_POST['playlist'], 
+								":rights"=> $_POST['users']
+								);
 			$right_query -> execute($bindsright);
 		
 		}
@@ -77,29 +77,33 @@
 		$binds = array(":userid" => $playlistowner);
 		$stmt_user -> execute($binds);
 		$userlist = $stmt_user -> fetchAll(PDO::FETCH_ASSOC);
-	
-		echo "<table><tr><th>Playlist name</th><th>User</th><th>Privilege</th><th>save</th></tr>";		
-			echo "<tr><td>".$playlistname; ?><form action="" method="post">
+	?>
+	<table><tr><th>Playlist name</th><th>User</th><th>Privileges</th><th>Save</th></tr>		
+		<tr>
+			<td><?php echo $playlistname; ?> </td>
+			<td>
+				<form action="" method="post">
+				<select name="users" class="width">"; 
+				<?php
+					for($j = 0; $j < count($userlist); $j++) { 
+						echo "<option value=\"".$userlist[$j]['userid']."\">". $userlist[$j]['username'] ."</option>";
+					}
+				?>
+				</select>
 			</td>
-			 <?php
-
-			echo "<td><select name=\"users\" class=\"width\">"; 
-			for($j = 0; $j < count($userlist); $j++) { 
-				echo "<option value=\"".$userlist[$j]['userid']."\">". $userlist[$j]['username'] ."</option>";
-			}
-			echo "</select></td>";
-			echo "<td>"; ?> 				
-		<input type="hidden" name="user" value="<?php echo $userlist[$j]['userid'];  ?>">						
-		<input type="hidden" name="playlist" value="<?php echo $playlistid;  ?>">
-		<select name="privilage" class="width">
-				<option value="0" selected="selected">no privilege</option>
-				<option value="1">can edit</option>
-				<option value="2">can edit and listen</option>
-		</select>
-	 
+			<td> 
+				<input type="hidden" name="user" value="<?php echo $_SESSION['userid'];  ?>">						
+				<input type="hidden" name="playlist" value="<?php echo $playlistid;  ?>">
+				<select name="privilage" class="width">
+					<option value="0" selected="selected">no priviledges</option>
+					<option value="1">can edit</option>
+					<option value="2">can edit and listen</option>
+				</select>
 			</td>
-			<td><input type="submit" name="submit_rights" value="save" />				
-			</form> </td></tr>
-		<?php
-		echo "</table><br /><br />";
-		} ?>
+			<td>
+				<input type="submit" name="submit_rights" value="save" />				
+			</form> 
+			</td>
+		</tr>
+	</table>
+<br /><br />

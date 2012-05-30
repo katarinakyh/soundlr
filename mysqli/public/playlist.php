@@ -31,11 +31,12 @@
 		
 		function updatePlaylists($PDO) {
 			$stmt2 = $PDO -> prepare(
-							"SELECT playlists.name, playlists.date, COUNT(playlist_song.song_id) AS songs 
+							"SELECT playlists.id, playlists.name, playlists.user_id, playlists.date, 
+							COUNT(playlist_song.song_id) AS songs 
 							FROM playlists  
 							LEFT JOIN playlist_song 
 							ON playlists.id = playlist_song.playlist_id
-							WHERE user_id = :userid
+							WHERE playlists.user_id = :userid
 							GROUP BY playlists.id  
 							ORDER BY playlists.id DESC"
 						);
@@ -47,7 +48,7 @@
 			//echo $count;
 			for($i = 0; $i < count($playlists); $i++) {
 				echo "<tr><td>" . $playlists[$i]['name']."</td>";
-				echo "<td></td>";
+				echo "<td><a href=\"edit.php?id=".$playlists[$i]['id']."&owner=".$playlists[$i]['user_id']."&name=".$playlists[$i]['name']."\"> Edit </a></td>";
 				echo "<td>". $playlists[$i]['songs']."</td>";
 				echo "<td>" . $playlists[$i]['date']."</td></tr>"; 
 			}
