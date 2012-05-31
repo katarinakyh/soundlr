@@ -70,7 +70,7 @@
 	
 	<div class="wrapper">
 		<div class="playlist"><?php include('playlist.php'); ?></div>
-		<div class="admin">
+		<div class="search">
 		<table>
 		  <tr>
 		     <th colspan="3" >Search</td>
@@ -86,17 +86,9 @@
 		<?php
 		if ($var == "")
 		  {
-			  echo "<div class=\"result_message\">Please enter a search...</div>";
+			  echo "<div class=\"result_message start\">Please enter a search...</div>";
 			  exit;
 		  }
-		
-			
-		if ($count == 0) {
-			echo "<h4>Results</h4>";
-			echo "<div class=\"result_message\">Sorry, your search: &quot;" . $var . "&quot; retured zero results</div>";
-		} else {
-			echo "<div class=\"result_message\">Your search for: &quot;" . $var . "&quot; returned " .count($result_set). " results</div>";
-			
 			$i = 0; ?>
 	
 			<?php if (isset($_POST['submit_song_to_playlist'])) { 
@@ -105,6 +97,16 @@
 		
 			
 			<table class="searchresults">
+			<tr><th colspan="4">
+			<?php
+					if ($count == 0) {
+
+			echo "<div class=\"result_message\">Sorry, your search: &quot;" . $var . "&quot; retured zero results</div>";
+		} else {
+			echo "<div class=\"result_message\">Your search for: &quot;" . $var . "&quot; returned " .count($result_set). " results</div>";
+			?>
+			
+			</th></tr>	
 			<tr><th>Add</th><th><a href="index.php?search=<?php echo $var ?>&sort_type=song">Song</a>
 				</th><th><a href="index.php?search=<?php echo $var ?>&sort_type=artist">Artist</a></th>
 				<th><a href="index.php?search=<?php echo $var ?>&sort_type=album">Album</a></th></tr>
@@ -118,7 +120,7 @@
 					<input type="submit" name="submit_song_to_playlist" value="+" />				
 				</form>
 			</th>
-			<td><?php echo "<a href=\"song.php?track=" . $result_set[$i]['track']. "&id=".$result_set[$i]['id']."&artist_id=\"". $result_set[$i]['artist_id']."\">". $result_set[$i]['track']. "</a></td><td> <a href=\"artist.php?artist=" .$result_set[$i]['artist']. "\">". $result_set[$i]['artist']."</a></td><td>  <a href=\"album.php?album=".$result_set[$i]['album']."\">". $result_set[$i]['album']. "</a></td></tr>";
+			<td><?php echo "<a href=\"song.php?track=" . $result_set[$i]['track']. "&id=".$result_set[$i]['id']."&artist_id=\"". $result_set[$i]['artist_id']."\">". $result_set[$i]['track']. "</a></td><td> ". $result_set[$i]['artist']."</td><td> ". $result_set[$i]['album']. "</td></tr>";
 				$i++; 
 			}
 			echo "</table>";

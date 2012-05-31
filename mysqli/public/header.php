@@ -8,16 +8,19 @@
 	</head>
 	<body>
 		<a href="index.php"><h1 class='logo_top'></h1></a>
-		<h2>Welcome 
-		<?php if(@$_GET['l']){
-				echo "to Soundlr";
-			}else if((isset($_SESSION['username']) && $_SESSION['username'] != 'none')){
-				echo $_SESSION['username']. ' ' .$_SESSION['userid'];
-				echo '<h2><a href="login.php?l=logout">Log out</a></h2>';
-			}else{
-				echo "to Soundlr";
-			}
-		?>	
-		</h2>
+		<header>
+			<h2>Welcome 
+			<?php if(@$_GET['l']){
+					echo "to Soundlr";
+				}else if((isset($_SESSION['username']) && $_SESSION['username'] != 'none')){
+					echo $_SESSION['username'];
+					echo '<h2><a href="login.php?l=logout">Log out</a></h2>';
+				}else{
+					echo "to Soundlr";
+				}
+			?>	
+			</h2>
+		</header>
 		<hr />
+		<div class="wrapper">
 		

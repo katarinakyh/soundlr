@@ -48,8 +48,16 @@
 				$stmt23->execute($binds);
 				$count = $stmt23->rowCount();
 				$result_set23 = $stmt23->fetchAll(PDO::FETCH_ASSOC);
-
-				$num = $result_set23[0]['avg'];  
+				// print_r($result_set23);
+				if(isset($result_set23[0])){
+					$num = $result_set23[0]['avg'];  
+				}
+				else{
+					$num = -999;
+				}
+					
+					
+				
 
 				$stmt27 = $PDO->prepare("
 					SELECT song.name as track, song.id as id, artist.name as artist, album.name as album
@@ -251,8 +259,8 @@
 			</tr>
 			</table>
 		<?php	
-		if (isset($_POST['sims']) && $result_set27[0]['track'] != '') { ?>
-			<table class="searchresults cat">
+		if (isset($_POST['sims']) && isset($result_set27[0]['track']) && $result_set27[0]['track'] != '') { ?>
+			<table class="searchresults genre">
 			<tr>
 				<th>Song</th>
 				<th>Artist</th>

@@ -95,7 +95,7 @@
 		$playlists = $stmt2 -> fetchAll(PDO::FETCH_ASSOC);
 	
 		$count = count($playlists);
-		echo "<h1>".$playlistname."</h1>";
+		echo "<h1>Edit playlist: ".$playlistname."</h1>";
 		echo "<table><tr><th>Song</th><th>Artist</th><th>Album</th><th>Remove</th></tr>";		
 		for($i = 0; $i < count($playlists); $i++) {
 			echo "<tr><td>" . $playlists[$i]['songs']."</td>";

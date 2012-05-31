@@ -22,7 +22,7 @@
 	</table>
 </form>
 <form action="" method="post" name="currentplaylist" id="currentplaylist">
-	<table>
+	<table class="kurew">
 		<tr>
 			<th colspan="5" >Your Playlists</td>
 		</tr>
