@@ -32,6 +32,55 @@
 		$count = $result_set['affected_rows'];
 		$result_set = $result_set['rows'][0];
 		//print_r($result_set);
+
+		if (isset($_POST['sims'])) {
+			 
+
+			for ($i = 0; $i < 4; $i++) {
+				$stmt23 = $PDO->prepare("SELECT AVG(ratings.rating) AS avg, ratings.categories_id
+						       FROM ratings
+						       INNER JOIN categories ON ratings.categories_id = categories.id
+						       WHERE ratings.categories_id = ".$i."
+						       AND song_id = ".$id."
+						       GROUP BY ratings.categories_id");
+
+
+				$stmt23->execute($binds);
+				$count = $stmt23->rowCount();
+				$result_set23 = $stmt23->fetchAll(PDO::FETCH_ASSOC);
+
+				$num = $result_set23[0]['avg'];  
+
+				$stmt27 = $PDO->prepare("
+					SELECT song.name as track, song.id as id, artist.name as artist, album.name as album
+					FROM song 
+					
+					LEFT JOIN song_artist
+					ON song_artist.song_id = song.id
+			
+					LEFT JOIN artist
+					ON artist.id = song_artist.artist_id
+			
+					LEFT JOIN song_album
+					ON song_album.song_id = song.id
+			
+					LEFT JOIN album
+					ON album.id = song_album.album_id
+				
+					LEFT JOIN ratings ON song.id = ratings.song_id 
+					WHERE ratings.categories_id=".$i." 
+					AND ratings.rating BETWEEN ".($num-1)." AND ".($num+1)."
+				");
+
+				$stmt27->execute($binds);
+				$count = $stmt27->rowCount();
+				$result_set27 = $stmt27->fetchAll(PDO::FETCH_ASSOC);
+				
+			
+			}
+		}
+		//  print_r($result_set27);
+
 		?>
 		
 		<div class="wrapper">
@@ -69,7 +118,7 @@
 						<option value="4">4</option>
 						<option value="5" selected="selected">5</option>
 						<option value="6">6</option>
-						<option value="7">7</option>
+					<option value="7">7</option>
 						<option value="8">8</option>
 						<option value="9">9</option>
 						<option value="10">10</option>
@@ -156,7 +205,7 @@
 					$rates = array();
 					$empty = array();
 					$ratequery = "
-						SELECT AVG(ratings.rating) AS avg, ratings.categories_id 
+				 		SELECT AVG(ratings.rating) AS avg, ratings.categories_id 
 						FROM ratings 
 						INNER JOIN categories ON ratings.categories_id = categories.id 
 						WHERE ratings.categories_id = :catid 
@@ -193,12 +242,40 @@
 				<td rowspan="2"></td>
 			</tr>
 			<tr>	
-					<th colspan=4 class="rate"><input type="submit" name="submit" value="Vote" /></th>
+					<th colspan=4 class="rate">
+						<input type="submit" name="submit" value="Vote" />
+						<input type="submit" name="sims" value="Find Similar" /></th>
 			</tr>
 				
 				
 			</tr>
 			</table>
+		<?php	
+		if (isset($_POST['sims']) && $result_set27[0]['track'] != '') { ?>
+			<table class="searchresults cat">
+			<tr>
+				<th>Song</th>
+				<th>Artist</th>
+				<th>Album</th>
+			</tr>
+		
+		<?php
+			for ($i = 0; $i < count($result_set27); $i++) { 
+				echo "
+				<tr><td><a href=\"song.php?track=" . $result_set27[$i]['track']. "&id=".$result_set27[$i]['id']."\">"
+					. $result_set27[$i]['track']. "</a></td>
+					<td>". $result_set27[$i]['album']. "</td>
+					<td>". $result_set27[$i]['artist']. "</td>
+				</tr>"; 
+		}
+
+		} else {
+			if (isset($_POST['sims'])) {	
+			echo "No match found!";
+			}		
+		}		
+		?>
+		</table>
 		</div>
 		
 		<?php
