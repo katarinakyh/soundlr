@@ -1,7 +1,7 @@
 <?php
 	if(isset($_POST['currentlist'])){
 		$_SESSION['currentlist'] = $_POST['currentlist'];
-		echo $_SESSION['currentlist']; 
+		//echo $_SESSION['currentlist']; 
 	}	
 ?>
 <form action="" method="post" name="playlist_form" id="playlist_form">
@@ -18,52 +18,85 @@
 			</td></td>
 			<input type="hidden" name="company_id" value="" />
 			<input type="hidden" name="add_playlist" value="playlist_form" />
+		</tr>
+	</table>
 </form>
-</tr>
-</table>
-	<form action="" method="post" name="currentplaylist" id="currentplaylist">
+<form action="" method="post" name="currentplaylist" id="currentplaylist">
 	<table>
 		<tr>
 			<th colspan="5" >Your Playlists</td>
 		</tr>
 		<tr>
 			<th> Current </th>
-			<th>Name</th>
+			<th> Name </th>
 			<th> Edit </th>
 			<th># Tracks</th>
 			<th> Date </th>
 		</tr>
 		<?php
 			include_once ('../server/connect.php');
-			
-			function updatePlaylists($PDO) {
-				$updatequery = "
-					SELECT playlists.id, playlists.name, playlists.user_id, playlists.date, 
-					COUNT(playlist_song.song_id) AS songs 
-					FROM playlists  
-					LEFT JOIN playlist_song 
-					ON playlists.id = playlist_song.playlist_id
-					WHERE playlists.user_id = :userid
-					GROUP BY playlists.id  
-					ORDER BY playlists.id DESC";
-				$udatebinds = array(":userid" => $_SESSION['userid']);
-				$playlists = executeQuery($updatequery,$udatebinds, $PDO);
+
+			$updatequery = "
+				SELECT playlists.id, playlists.name, playlists.user_id, playlists.date, 
+				COUNT(playlist_song.song_id) AS songs 
+				FROM playlists  
+				LEFT JOIN playlist_song 
+				ON playlists.id = playlist_song.playlist_id
+				WHERE playlists.user_id = :userid
+				GROUP BY playlists.id  
+				ORDER BY playlists.id DESC";
+
+			$adminquery = "
+			 	SELECT playlists.id, playlists.name, playlists.user_id, 
+				playlists.date, playlist_rights.right_to_change AS rights, 
+				COUNT(playlist_song.song_id) AS songs 
+				
+				FROM playlists  
+				LEFT JOIN playlist_song 
+				ON playlists.id = playlist_song.playlist_id
+				LEFT JOIN playlist_rights 
+				ON playlists.id = playlist_rights.playlist_id
+				
+				WHERE playlist_rights.users_id = :userid
+				
+				GROUP BY playlists.id  
+				ORDER BY playlists.id DESC";
+
+				
+			function updatePlaylists($qry, $PDO) {
+				$updatebinds = array(":userid" => $_SESSION['userid']);
+				$playlists = executeQuery($qry,$updatebinds, $PDO);
 				$playlistcount = $playlists['affected_rows'];
 				$playlists = $playlists['rows'];
 				
 				for($i = 0; $i < $playlistcount; $i++) {
-					echo "<tr><td> <input type=\"radio\" class=\"currentlist\" name=\"currentlist\" value=\"" .$playlists[$i]['id']."\"";
-					if(isset($_SESSION['currentlist']) && $_SESSION['currentlist'] == $playlists[$i]['id']){
-						echo "checked = \"checked\"";	
-					} 
-					echo "/>";
+						
+					echo "<tr><td>";
+					if(isset($playlists[$i]['rights']) && $playlists[$i]['rights'] == FALSE){
+						echo " <input type=\"radio\" class=\"currentlist\" name=\"currentlist\" value=\"" .$playlists[$i]['id']."\" disabled=\"disabled\" />";
+						
+					}else{
+						echo " <input type=\"radio\" class=\"currentlist\" name=\"currentlist\" value=\"" .$playlists[$i]['id']."\"";
+						if(isset($_SESSION['currentlist']) && $_SESSION['currentlist'] == $playlists[$i]['id']){
+							echo "checked = \"checked\"";	
+						}
+						echo "/>";
+						
+					}
 					echo "</td>";	
 					echo "<td>" . $playlists[$i]['name']."</td>";
-					echo "<td><a href=\"edit.php?id=".$_SESSION['currentlist']."&owner=".$playlists[$i]['user_id']."&name=".$playlists[$i]['name']."\"> Edit </a></td>";
+					echo "<td>";
+					if(!isset($playlists[$i]['rights'])){
+						echo "<a href=\"edit.php?id=".$_SESSION['currentlist']."&owner=".$playlists[$i]['user_id'];
+						echo "&name=".$playlists[$i]['name']."\"> Edit </a>";
+					}
+					echo "</td>";
 					echo "<td>". $playlists[$i]['songs']."</td>";
 					echo "<td>" . $playlists[$i]['date']."</td></tr>"; 
+					}
+					
 				}
-			}
+			
 	
 	
 			if ((isset($_POST["add_playlist"])) && $_POST["playlist_name"] != NULL) {
@@ -73,8 +106,22 @@
 				executeQuery($addquery,$binds1, $PDO);
 				$_POST["playlist_name"] = NULL;
 			}
-
-			updatePlaylists($PDO);
+			
+			updatePlaylists($updatequery,$PDO); ?>
+			<tr>
+				<th colspan="5" >Other playlists</td>
+			</tr>
+			<tr>
+				<th> Current </th>
+				<th>Name</th>
+				<th> Edit </th>
+				<th># Tracks</th>
+				<th> Date </th>
+			</tr>
+			
+			
+		<?php
+			updatePlaylists($adminquery,$PDO);
 		?>
 	</table>
 </form>
